@@ -1,0 +1,49 @@
+const Transaction = require('./transaction');
+
+class TransactionPool {
+    constructor() {
+        this.transactions = [];
+    }
+
+    updateOrAddTransaction(transaction) {
+        let transactionWithhId = this
+            .transactions.find(t => t.id === transaction.id);
+
+        if (transactionWithhId) {
+            this.transactions[this
+                .transactions.indexOf(transactionWithhId)] = transaction;
+        } else {
+            this.transactions.push(transaction);
+        }
+    }
+
+    existingTransaction(address) {
+        return this.transactions.find(t => t.input.address === address);
+    }
+
+    validTransactions() {
+        return this.transactions.filter(transaction => {
+            const outputTotal = transaction.outputs.reduce(
+                (total, output) => {return total+output.amount;},
+            0);
+
+            if(transaction.input.amount !== outputTotal){
+                console.log(`invalid transaction from ${transaction.input.address}.`);
+                return;
+            }
+
+            if(!Transaction.verifyTransaction(transaction)){
+                console.log(`Invalid signature from ${transactio.input.address}.`);
+                return;
+            }
+
+            return transaction;
+        });
+    }
+
+    clear(){
+        this.transactions = [];
+    }
+}
+
+module.exports = TransactionPool;
